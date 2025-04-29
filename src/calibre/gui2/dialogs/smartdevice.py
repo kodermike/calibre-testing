@@ -90,6 +90,10 @@ class SmartdeviceDialog(QDialog, Ui_Dialog):
         if pw:
             self.password_box.setText(pw)
 
+        distime = self.device_manager.get_option('smartdevice','autodisconnect_time')
+        if distime:
+            self.autodisconnect_time.setText(distime)
+
         forced_ip = self.device_manager.get_option('smartdevice', 'force_ip_address')
         if forced_ip:
             self.ip_addresses.setText(forced_ip)

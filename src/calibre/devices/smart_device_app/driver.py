@@ -234,6 +234,7 @@ class SMART_DEVICE_APP(DeviceConfig, DevicePlugin):
 
     SEND_NOOP_EVERY_NTH_PROBE   = 5
     DISCONNECT_AFTER_N_SECONDS  = 30*60  # 30 minutes
+    DEFAULT_DISCONNECT_AFTER_N_SECONDS = 30*60
 
     PURGE_CACHE_ENTRIES_DAYS    = 30
 
@@ -284,19 +285,19 @@ class SMART_DEVICE_APP(DeviceConfig, DevicePlugin):
 
     EXTRA_CUSTOMIZATION_MESSAGE = [
         _('Enable connections at startup') + ':::<p>' +
-        _('Check this box to allow connections when calibre starts') + '</p>',
-        '',
+        _('Check this box to allow connections when calibre starts') + '</p>', #0
+        '', #1
         _('Security password') + ':::<p>' +
-        _('Enter a password that the device app must use to connect to calibre') + '</p>',
-        '',
+        _('Enter a password that the device app must use to connect to calibre') + '</p>', #2
+        '', #3
         _('Use fixed network port') + ':::<p>' +
         _('If checked, use the port number in the "Port" box, otherwise '
-            'the driver will pick a random port') + '</p>',
+            'the driver will pick a random port') + '</p>', #4
         _('Port number: ') + ':::<p>' +
-        _('Enter the port number the driver is to use if the "fixed port" box is checked') + '</p>',
+        _('Enter the port number the driver is to use if the "fixed port" box is checked') + '</p>', #5
         _('Print extra debug information') + ':::<p>' +
-        _('Check this box if requested when reporting problems') + '</p>',
-        '',
+        _('Check this box if requested when reporting problems') + '</p>', #6
+        '', #7
         _('Comma separated list of metadata fields '
             'to turn into collections on the device.') + ':::<p>' +
         _('Possibilities include: series, tags, authors, etc' +
@@ -305,24 +306,28 @@ class SMART_DEVICE_APP(DeviceConfig, DevicePlugin):
             'these values to the list to enable them. The collections will be '
             'given the name provided after the ":" character.')%dict(
                 abt='abt', abtv=ALL_BY_TITLE, aba='aba', abav=ALL_BY_AUTHOR,
-                abs='abs', absv=ALL_BY_SOMETHING),
-        '',
+                abs='abs', absv=ALL_BY_SOMETHING), #8
+        '', #9
         _('Enable the no-activity timeout') + ':::<p>' +
         _('If this box is checked, calibre will automatically disconnect if '
             'a connected device does nothing for %d minutes. Unchecking this '
             ' box disables this timeout, so calibre will never automatically '
-            'disconnect.')%(DISCONNECT_AFTER_N_SECONDS/60,) + '</p>',
+            'disconnect.')%(DISCONNECT_AFTER_N_SECONDS/60,) + '</p>',#10
+        '',#11
+        _('Disconnect After (default 30): ') + ':::<p>' +
+        _('Enter the number of minutes before auto disconnecting if the "no-activity timeout" box is checked') + '</p>', #12
+        '', #13
         _('Use this IP address') + ':::<p>' +
         _('Use this option if you want to force the driver to listen on a '
             'particular IP address. The driver will listen only on the '
             'entered address, and this address will be the one advertised '
-            'over mDNS (BonJour).') + '</p>',
+            'over mDNS (BonJour).') + '</p>', #14
         _('Replace books with same calibre ID') + ':::<p>' +
         _('Use this option to overwrite a book on the device if that book '
             'has the same calibre identifier as the book being sent. The file name of the '
             'book will not change even if the save template produces a '
             'different result. Using this option in most cases prevents '
-            'having multiple copies of a book on the device.') + '</p>',
+            'having multiple copies of a book on the device.') + '</p>', #15
         _('Cover thumbnail compression quality') + ':::<p>' +
         _('Use this option to control the size and quality of the cover '
             'file sent to the device. It must be between 50 and 99. '
@@ -332,35 +337,47 @@ class SMART_DEVICE_APP(DeviceConfig, DevicePlugin):
             'times as big. To see the changes you must force calibre '
             'to resend metadata to the device, either by changing '
             'the metadata for the book (updating the last modification '
-            'time) or resending the book itself.') + '</p>',
+            'time) or resending the book itself.') + '</p>', #16
         _('Use metadata cache') + ':::<p>' +
         _('Setting this option allows calibre to keep a copy of metadata '
             'on the device, speeding up device connections. Unsetting this '
             'option disables keeping the copy, forcing the device to send '
             'metadata to calibre on every connect. Unset this option if '
-            'you think that the cache might not be operating correctly.') + '</p>',
-        '',
+            'you think that the cache might not be operating correctly.') + '</p>', #17
+        '',#18
         _('Additional file extensions to send to the device') + ':::<p>' +
         _('This is a comma-separated list of format file extensions you want '
             'to be able to send to the device. For example, you might have '
             'audio books in your library with the extension "m4b" that you '
             'want to listen to on your device. Don\'t worry about the "extra '
-            'enabled extensions" warning.'),
+            'enabled extensions" warning.'), #19
         _('Ignore device free space') + ':::<p>' +
         _("Check this box to ignore the amount of free space reported by your "
           "devices. This might be needed if you store books on an SD card and "
-          "the device doesn't have much free main memory.") + '</p>',
+          "the device doesn't have much free main memory.") + '</p>', #20
         ]
     EXTRA_CUSTOMIZATION_DEFAULT = [
-                False, '',
-                '',    '',
-                False, '9090',
-                False, '',
-                '',    '',
-                False, '',
-                True,   '75',
-                True,   '',
-                '',     False,
+                False, # 0
+                '', # 1
+                '', # 2
+                '', # 3
+                False, # 4
+                '9090', # 5
+                False, # 6
+                '', # 7
+                '',  # 8
+                '', # 9
+                False, #10
+                '', #11
+                '', #12
+                '', #13
+                '', #14
+                True,  #15 
+                '75', #16
+                True,   # 17
+                '', #18
+                '',    #19 
+                False #20
     ]
     OPT_AUTOSTART               = 0
     OPT_PASSWORD                = 2
@@ -369,19 +386,20 @@ class SMART_DEVICE_APP(DeviceConfig, DevicePlugin):
     OPT_EXTRA_DEBUG             = 6
     OPT_COLLECTIONS             = 8
     OPT_AUTODISCONNECT          = 10
-    OPT_FORCE_IP_ADDRESS        = 11
-    OPT_OVERWRITE_BOOKS_UUID    = 12
-    OPT_COMPRESSION_QUALITY     = 13
-    OPT_USE_METADATA_CACHE      = 14
-    OPT_EXTRA_EXTENSIONS        = 16
-    OPT_IGNORE_FREESPACE        = 17
+    OPT_AUTODISCONNECT_TIME     = 12
+    OPT_FORCE_IP_ADDRESS        = 14
+    OPT_OVERWRITE_BOOKS_UUID    = 15
+    OPT_COMPRESSION_QUALITY     = 16
+    OPT_USE_METADATA_CACHE      = 17
+    OPT_EXTRA_EXTENSIONS        = 19
+    OPT_IGNORE_FREESPACE        = 20
     OPTNAME_TO_NUMBER_MAP = {
         'password': OPT_PASSWORD,
         'autostart': OPT_AUTOSTART,
         'use_fixed_port': OPT_USE_PORT,
         'port_number': OPT_PORT_NUMBER,
         'force_ip_address': OPT_FORCE_IP_ADDRESS,
-        'thumbnail_compression_quality': OPT_COMPRESSION_QUALITY,
+        'thumbnail_compression_quality': OPT_COMPRESSION_QUALITY
     }
 
     def __init__(self, path):
@@ -973,17 +991,49 @@ class SMART_DEVICE_APP(DeviceConfig, DevicePlugin):
                     # This will usually toss an exception if the socket is gone.
                 except:
                     pass
-            if (self.settings().extra_customization[self.OPT_AUTODISCONNECT] and
-                    self.noop_counter > self.DISCONNECT_AFTER_N_SECONDS):
-                self._close_device_socket()
-                self._debug('timeout -- disconnected')
-            else:
-                try:
-                    if self._call_client('NOOP', {})[0] is None:
+            # Commented out for testing
+            #if (self.settings().extra_customization[self.OPT_AUTODISCONNECT] and
+            #        self.noop_counter > self.DISCONNECT_AFTER_N_SECONDS):
+            #   self._close_device_socket()
+            #    self._debug('timeout -- disconnected')
+            #else:
+            #    try:
+            #        if self._call_client('NOOP', {})[0] is None:
+            #            self._close_device_socket()
+            #    except:
+            #        self._close_device_socket()
+            #return self if self.is_connected else None
+            if self.settings().extra_customization[self.OPT_AUTODISCONNECT_TIME]:
+                if ( (int(self.settings().extra_customization[self.OPT_AUTODISCONNECT_TIME]) > 0) and
+                    (int(self.settings().extra_customization[self.OPT_AUTODISCONNECT_TIME]) < 60 ) ):
+                        self.autodisconnect_time = (int(self.settings().extra_customization[self.OPT_AUTODISCONNECT_TIME]) * 60) // self.SEND_NOOP_EVERY_NTH_PROBE
+                        self._debug('setting autodisconnect by * 60')
+                elif not (int(self.settings().extra_customization[self.OPT_AUTODISCONNECT_TIME]) > 0):
+                    self.autodisconnect_time = (30*60) // self.SEND_NOOP_EVERY_NTH_PROBE
+                    self.set_option('autodisconnect_time', str(self.autodisconnect_time))
+                    message = _('saved %s')%self.autodisconnect_time
+                    self._debug(message)
+                else:
+                    self.autodisconnect_time = (int(self.settings().extra_customization[self.OPT_AUTODISCONNECT_TIME])) // self.SEND_NOOP_EVERY_NTH_PROBE
+
+                message = _('Current autodisconnect value: %s')%self.autodisconnect_time
+                self._debug(message)
+                message = _('Current noop_counter value: %s')%self.noop_counter
+                self._debug(message)
+
+                if self.noop_counter > self.autodisconnect_time:
+                    # self._close_device_socket()
+                    self.eject()
+                    self._debug('timeout -- disconnected')
+                else:
+                    try:
+                        if self._call_client('NOOP', {})[0] is None:
+                            self._close_device_socket()
+                            self.eject()
+                    except:
                         self._close_device_socket()
-                except:
-                    self._close_device_socket()
-            return self if self.is_connected else None
+                        self.eject()
+                return self if self.is_connected else None
 
         if getattr(self, 'listen_socket', None) is not None:
             try:
@@ -1910,7 +1960,7 @@ class SMART_DEVICE_APP(DeviceConfig, DevicePlugin):
                 return message
 
             i = 0
-
+#MPC
             if self.settings().extra_customization[self.OPT_USE_PORT]:
                 try:
                     opt_port = int(self.settings().extra_customization[self.OPT_PORT_NUMBER])
